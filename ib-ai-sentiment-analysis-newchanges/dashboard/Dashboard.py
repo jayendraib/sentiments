@@ -1078,7 +1078,7 @@ if not st.session_state.show_main_dashboard:
     cust_trend_text = get_trend_text(avg_customer_sentiment)
 
     # Show 4 KPI cards instead of 3
-    cols = st.columns(4)
+    cols = st.columns(2)
 
     with cols[0]:
         st.markdown(f"""
@@ -1100,32 +1100,33 @@ if not st.session_state.show_main_dashboard:
         </div>
         """, unsafe_allow_html=True)
 
-    with cols[2]:
-        st.markdown(f"""
-        <div class="metric-card" style="min-height: 140px;">
-            <div class="metric-icon">😊</div>
-            <div class="metric-value">{avg_agent_sentiment:+.0f}</div>
-            <div class="metric-label">Agent Sentiment</div>
-            <span class="metric-trend {agent_trend_class}">{agent_trend_text}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    # with cols[2]:
+    #     st.markdown(f"""
+    #     <div class="metric-card" style="min-height: 140px;">
+    #         <div class="metric-icon">😊</div>
+    #         <div class="metric-value">{avg_agent_sentiment:+.0f}</div>
+    #         <div class="metric-label">Agent Sentiment</div>
+    #         <span class="metric-trend {agent_trend_class}">{agent_trend_text}</span>
+    #     </div>
+    #     """, unsafe_allow_html=True)
 
-    with cols[3]:
-        st.markdown(f"""
-        <div class="metric-card" style="min-height: 140px;">
-            <div class="metric-icon">🎯</div>
-            <div class="metric-value">{avg_customer_sentiment:+.0f}</div>
-            <div class="metric-label">Customer Sentiment</div>
-            <span class="metric-trend {cust_trend_class}">{cust_trend_text}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    # with cols[3]:
+    #     st.markdown(f"""
+    #     <div class="metric-card" style="min-height: 140px;">
+    #         <div class="metric-icon">🎯</div>
+    #         <div class="metric-value">{avg_customer_sentiment:+.0f}</div>
+    #         <div class="metric-label">Customer Sentiment</div>
+    #         <span class="metric-trend {cust_trend_class}">{cust_trend_text}</span>
+    #     </div>
+    #     """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
         # Column Headers - Added Avg Duration column
         # Column Headers - Added Avg Duration column
-    cols = st.columns([2, 1.2, 1.5, 1.5, 1.5, 1.5, 1.2, 1])
-    headers = ["Agent Name", "Total Calls", "Agent Talk %", "Customer Talk %", "Agent Sentiment", "Customer Sentiment", "Avg Duration"]
+    cols = st.columns([2, 1.2, 1.2, 1])
+    headers = ["Agent Name", "Total Calls", "Avg Duration"]
+    # headers = ["Agent Name", "Total Calls", "Agent Talk %", "Customer Talk %", "Agent Sentiment", "Customer Sentiment", "Avg Duration"]
     for i, header in enumerate(headers):
         cols[i].markdown(f"<div style='padding: 12px 0; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;'>{header}</div>", unsafe_allow_html=True)
 
@@ -1145,17 +1146,17 @@ if not st.session_state.show_main_dashboard:
         agent_badge = "badge-positive" if agent_sent > 20 else "badge-negative" if agent_sent < -20 else "badge-neutral"
         cust_badge = "badge-positive" if cust_sent > 20 else "badge-negative" if cust_sent < -20 else "badge-neutral"
 
-        cols = st.columns([2, 1.2, 1.5, 1.5, 1.5, 1.5, 1.2, 1])
+        cols = st.columns([2, 1.2, 1.2, 1])
 
         cols[0].markdown(f"**{agent_name}**")
         cols[1].markdown(f"{agent_total_calls}")  # Individual agent's call count
-        cols[2].markdown(f"{row['Average Agent Talk Percent']}%")
-        cols[3].markdown(f"{row['Average Customer Talk Percent']}%")
-        cols[4].markdown(f"<span class='badge {agent_badge}'>{agent_sent:+.0f}</span>", unsafe_allow_html=True)
-        cols[5].markdown(f"<span class='badge {cust_badge}'>{cust_sent:+.0f}</span>", unsafe_allow_html=True)
-        cols[6].markdown(duration_str)
+        # cols[2].markdown(f"{row['Average Agent Talk Percent']}%")
+        # cols[3].markdown(f"{row['Average Customer Talk Percent']}%")
+        # cols[4].markdown(f"<span class='badge {agent_badge}'>{agent_sent:+.0f}</span>", unsafe_allow_html=True)
+        # cols[5].markdown(f"<span class='badge {cust_badge}'>{cust_sent:+.0f}</span>", unsafe_allow_html=True)
+        cols[2].markdown(duration_str)
 
-        if cols[7].button("View", key=f"view_{idx}_{agent_name}"):
+        if cols[3].button("View", key=f"view_{idx}_{agent_name}"):
             st.session_state.selected_agent_filter = agent_name
             st.session_state.show_main_dashboard = True
             st.rerun()
@@ -1251,8 +1252,9 @@ if st.session_state.selected_call is None:
     st.markdown('<div class="custom-table">', unsafe_allow_html=True)
 
     # Column Headers - Adjusted column ratios for better button display
-    cols = st.columns([3, 2, 2, 2, 2, 2, 1.5])
-    headers = ["Call ID", "Duration", "Agent Talk %", "Customer Talk %", "Sentiment", "Date", "Action"]
+    cols = st.columns([3, 2, 2, 1.5])
+    headers = ["Call ID", "Duration", "Date", "Action"]
+    # headers = ["Call ID", "Duration", "Agent Talk %", "Customer Talk %", "Sentiment", "Date", "Action"]
     for i, header in enumerate(headers):
         cols[i].markdown(f"<div style='padding: 12px 0; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;'>{header}</div>", unsafe_allow_html=True)
 
@@ -1276,20 +1278,20 @@ if st.session_state.selected_call is None:
         """, unsafe_allow_html=True)
 
         # Adjusted column ratios - last column is wider (1.5 instead of 1)
-        cols = st.columns([3, 2, 2, 2, 2, 2, 1.5])
+        cols = st.columns([3, 2, 2, 1.5])
 
         cols[0].markdown(f"<div id='call_row_{i}' style='padding: 16px 0; font-weight: 500; color: #f8fafc;'>{row['Call ID']}</div>", unsafe_allow_html=True)
         cols[1].markdown(f"<div style='padding: 16px 0; color: #cbd5e1;'>{row['Duration']}</div>", unsafe_allow_html=True)
-        cols[2].markdown(f"<div style='padding: 16px 0; color: #cbd5e1;'>{row['Agent Talk %']}%</div>", unsafe_allow_html=True)
-        cols[3].markdown(f"<div style='padding: 16px 0; color: #cbd5e1;'>{row['Customer Talk %']}%</div>", unsafe_allow_html=True)
+        # cols[2].markdown(f"<div style='padding: 16px 0; color: #cbd5e1;'>{row['Agent Talk %']}%</div>", unsafe_allow_html=True)
+        # cols[3].markdown(f"<div style='padding: 16px 0; color: #cbd5e1;'>{row['Customer Talk %']}%</div>", unsafe_allow_html=True)
 
-        badge_class = "badge-positive" if sentiment == "POSITIVE" else "badge-negative" if sentiment == "NEGATIVE" else "badge-neutral"
-        cols[4].markdown(f"<div style='padding: 16px 0;'><span class='badge {badge_class}'>{row['Sentiment']}</span></div>", unsafe_allow_html=True)
+        # badge_class = "badge-positive" if sentiment == "POSITIVE" else "badge-negative" if sentiment == "NEGATIVE" else "badge-neutral"
+        # cols[4].markdown(f"<div style='padding: 16px 0;'><span class='badge {badge_class}'>{row['Sentiment']}</span></div>", unsafe_allow_html=True)
 
-        cols[5].markdown(f"<div style='padding: 16px 0; color: #94a3b8; font-size: 13px;'>{row['Date']}</div>", unsafe_allow_html=True)
+        cols[2].markdown(f"<div style='padding: 16px 0; color: #94a3b8; font-size: 13px;'>{row['Date']}</div>", unsafe_allow_html=True)
 
         # Fixed View Button - Using a container with custom styling
-        with cols[6]:
+        with cols[3]:
             st.markdown('<div style="padding: 12px 0;">', unsafe_allow_html=True)
             if st.button("View", key=f"btn_{i}_{row['path']}", use_container_width=True):
                 st.session_state["selected_call_id"] = row["path"]
@@ -1332,564 +1334,563 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
 
-data = st.session_state.data
+# data = st.session_state.data
 
-# ============================================================
-# FIXED: Get precise conversation duration from call_records_test
-# ============================================================
-# ============================================================
-# FIXED: Get precise conversation duration from call_records_test
-# ============================================================
+# # ============================================================
+# # FIXED: Get precise conversation duration from call_records_test
+# # ============================================================
+# # ============================================================
+# # FIXED: Get precise conversation duration from call_records_test
+# # ============================================================
 call_id = st.session_state.selected_call
 
-# Get duration from call_records_test table (conversation_duration column) - PRIORITY 1
-conversation_duration_sec = get_conversation_duration(call_id)
-
-# Fallback to metadata duration from call_json - PRIORITY 2
-call_meta = data.get("metadata", {})
-metadata_duration = call_meta.get("call_duration_sec", 0)
-
-# PRIORITY ORDER: Database value > Metadata value > Default
-if conversation_duration_sec > 0:
-    call_duration_val = conversation_duration_sec
-    duration_source = "Database"
-elif isinstance(metadata_duration, (int, float)) and metadata_duration > 0:
-    call_duration_val = float(metadata_duration)
-    duration_source = "Metadata"
-elif isinstance(metadata_duration, str) and ':' in metadata_duration:
-    try:
-        parts = metadata_duration.split(':')
-        if len(parts) == 3:  # HH:MM:SS
-            call_duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-        elif len(parts) == 2:  # MM:SS
-            call_duration_val = int(parts[0]) * 60 + int(parts[1])
-        else:
-            call_duration_val = float(metadata_duration) if metadata_duration else 0
-        duration_source = "Metadata (parsed)"
-    except:
-        call_duration_val = 0
-        duration_source = "Default"
-else:
-    try:
-        call_duration_val = float(metadata_duration) if metadata_duration else 0
-        duration_source = "Metadata" if call_duration_val > 0 else "Default"
-    except:
-        call_duration_val = 0
-        duration_source = "Default"
-
-# Ensure duration is never negative and is float
-call_duration_val = max(0.0, float(call_duration_val))
-
-utterances = data['metadata'].get('utterances', {})
-agent_utt = utterances.get('agent', 0)
-cust_utt = utterances.get('customer', 0)
-total_utt = agent_utt + cust_utt
-agent_pct = (agent_utt / total_utt * 100) if total_utt else 0
-
-# Emotion data
-agent_emotion = data.get("emotion", {}).get("agent", {})
-cust_emotion = data.get("emotion", {}).get("customer", {})
-agent_emotion_conf = agent_emotion.get("confidence", 0)
-cust_emotion_conf = cust_emotion.get("confidence", 0)
-agent_emotion_label = agent_emotion.get("dominant_emotion", "neutral")
-cust_emotion_label = cust_emotion.get("dominant_emotion", "neutral")
-
-# Sentiment data - NOW SCALED DOWN in get_normalized()
-agent_sent = data.get("sentiment", {}).get("agent", {})
-cust_sent = data.get("sentiment", {}).get("customer", {})
-agent_norm = get_normalized(agent_sent)
-cust_norm = get_normalized(cust_sent)
-
-# Advanced insights
-advanced = data.get("advanced_insights", {})
-primary_intent = advanced.get("primary_intent", "N/A")
-intent_strength = advanced.get("customer_intent_strength", "N/A")
-resolution_status = advanced.get("resolution_status", "N/A")
-repeat_risk = advanced.get("repeat_call_risk", "N/A")
-compliance_risk = advanced.get("compliance_risk", "N/A")
-issue_detected = advanced.get("issue_detected", False)
-dominant_emotion = advanced.get("dominant_customer_emotion", "N/A")
-sentiment_explanation = advanced.get("sentiment_explanation", "N/A")
-
-# Entities
-entities = data.get("entities", {})
-orgs = entities.get("orgs", [])
-persons = entities.get("persons", [])
-locations = entities.get("locations", [])
-
-# Executive summary
-exec_summary = data.get("executive_summary", "")
-
-# KPI Cards - Top Row
-st.markdown("<div style='margin: 24px 0;'>", unsafe_allow_html=True)
-cols = st.columns(4)
-
-metrics = [
-    {"icon": "🎙️", "label": "Agent Utterances", "value": str(agent_utt), "sub": f"{agent_pct:.1f}% of conversation"},
-    {"icon": "💬", "label": "Customer Utterances", "value": str(cust_utt), "sub": f"{100-agent_pct:.1f}% of conversation"},
-    {"icon": "😊", "label": "Agent Sentiment", "value": f"{agent_norm:+.0f}", "sub": agent_emotion_label},
-    {"icon": "⏱️", "label": "Call Duration", "value": format_duration(call_duration_val), "sub": f"{call_duration_val:.0f}s ({duration_source})" if call_duration_val > 0 else "N/A"}]
-
-for i, metric in enumerate(metrics):
-    with cols[i]:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-icon">{metric['icon']}</div>
-            <div class="metric-value">{metric['value']}</div>
-            <div class="metric-label">{metric['label']}</div>
-            <div style="font-size: 12px; color: #64748b;">{metric['sub']}</div>
-        </div>
-        """, unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-# Second Row - Customer Metrics & Emotion
-cols = st.columns(4)
-
-with cols[0]:
-    cust_label = executive_sentiment_label(cust_norm)
-    trend_class = "trend-up" if cust_norm > 0.2 else "trend-down" if cust_norm < -0.2 else "trend-neutral"
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-icon">🎯</div>
-        <div class="metric-value">{cust_norm:+.0f}</div>
-        <div class="metric-label">Customer Sentiment</div>
-        <span class="metric-trend {trend_class}">{cust_label}</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-with cols[1]:
-    vol_status = "Stable" if cust_emotion_conf < 0.2 else "Volatile"
-    vol_class = "trend-up" if cust_emotion_conf < 0.2 else "trend-down"
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-icon">⚡</div>
-        <div class="metric-value">{cust_emotion_conf:.0%}</div>
-        <div class="metric-label">Emotion Confidence</div>
-        <span class="metric-trend {vol_class}">{vol_status}</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-with cols[2]:
-    intent_badge = "badge-positive" if intent_strength == "High" else "badge-warning" if intent_strength == "Medium" else "badge-neutral"
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-icon">🎯</div>
-        <div class="metric-value" style="font-size: 18px;">{primary_intent}</div>
-        <div class="metric-label">Primary Intent</div>
-        <span class="badge {intent_badge}">{intent_strength}</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-with cols[3]:
-    risk_badge = "badge-positive" if repeat_risk == "Low" else "badge-warning" if repeat_risk == "Medium" else "badge-negative"
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-icon">🔄</div>
-        <div class="metric-value" style="font-size: 18px;">{repeat_risk}</div>
-        <div class="metric-label">Repeat Call Risk</div>
-        <span class="badge {risk_badge}">{resolution_status}</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Charts Section - Two Columns
-st.markdown("<br>", unsafe_allow_html=True)
-col_left, col_right = st.columns([2, 1])
-
-with col_left:
-    # IMPROVED Sentiment Trend Chart - Management Friendly
-    st.markdown('<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">📈 Sentiment Flow During Call</div>', unsafe_allow_html=True)
-
-    # Add explanation for management
-    st.markdown("""
-    <div style="background: #0f172a; border-left: 3px solid #6366f1; padding: 12px 16px; margin-bottom: 16px; border-radius: 0 8px 8px 0;">
-        <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-            <strong style="color: #f8fafc;">How to read:</strong> This chart shows sentiment changes throughout the call.
-            <span style="color: #6366f1;">● Agent</span> (blue) and <span style="color: #f59e0b;">● Customer</span> (orange).
-            Values above 0 = Positive, Below 0 = Negative. The closer to +1 or -1, the stronger the sentiment.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # CHANGED: Now uses get_drift() which scales down from -100/+100 to -1/+1
-    agent_drift = get_drift(agent_sent)
-    cust_drift = get_drift(cust_sent)
-
-    if len(agent_drift) == 0:
-        agent_drift = [0]
-    if len(cust_drift) == 0:
-        cust_drift = [0]
-
-    max_len = max(len(agent_drift), len(cust_drift))
-    if len(agent_drift) < max_len:
-        agent_drift += [agent_drift[-1]] * (max_len - len(agent_drift))
-    if len(cust_drift) < max_len:
-        cust_drift += [cust_drift[-1]] * (max_len - len(cust_drift))
-
-    # ============================================================
-    # FIXED: Proper time point calculation using actual conversation duration
-    # ============================================================
-        # ============================================================
-    # FIXED: Proper time point calculation using actual conversation duration
-    # ============================================================
-
-    # Get the chunk duration from sentiment data (default to 10 seconds if not found)
-    agent_chunk_duration = agent_sent.get('chunk_duration_sec', 10)
-    cust_chunk_duration = cust_sent.get('chunk_duration_sec', 10)
-    chunk_duration = max(agent_chunk_duration, cust_chunk_duration, 1)  # At least 1 second
-
-    # Use actual conversation duration from database, fallback to calculated duration
-    effective_duration = call_duration_val if call_duration_val > 0 else (max_len * chunk_duration)
-
-    # Calculate time points based on actual call duration
-    if max_len == 1:
-        time_points = [0]
-    else:
-        # Distribute chunks evenly across the actual call duration
-        time_points = [round(i * effective_duration / (max_len - 1), 1) for i in range(max_len)]
-
-    # Ensure no negative values
-    time_points = [max(0.0, float(t)) for t in time_points]
-
-    # Create improved trend chart with filled areas
-    fig = go.Figure()
-
-    # Add filled area under lines for better visualization
-    fig.add_trace(go.Scatter(
-        x=time_points,
-        y=agent_drift,
-        mode="lines+markers",
-        name="Agent",
-        line=dict(color='#6366f1', width=3),
-        marker=dict(size=8, color='#6366f1', line=dict(color='#1e293b', width=2)),
-        fill='tozeroy',
-        fillcolor='rgba(99, 102, 241, 0.1)'
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=time_points,
-        y=cust_drift,
-        mode="lines+markers",
-        name="Customer",
-        line=dict(color='#f59e0b', width=3),
-        marker=dict(size=8, color='#f59e0b', line=dict(color='#1e293b', width=2)),
-        fill='tozeroy',
-        fillcolor='rgba(245, 158, 11, 0.1)'
-    ))
-
-    # Add reference lines
-    fig.add_hline(y=0, line_dash="solid", line_color="#475569", line_width=2,
-                  annotation_text="Neutral", annotation_position="right",
-                  annotation_font_color="#94a3b8")
-    fig.add_hline(y=50, line_dash="dash", line_color="#10b981", line_width=1,
-                  annotation_text="Positive Threshold", annotation_position="right",
-                  annotation_font_color="#10b981", annotation_font_size=10)
-    fig.add_hline(y=-50, line_dash="dash", line_color="#f43f5e", line_width=1,
-                  annotation_text="Negative Threshold", annotation_position="right",
-                  annotation_font_color="#f43f5e", annotation_font_size=10)
-
-    # Add shaded regions for positive/negative zones
-    fig.add_hrect(y0=0, y1=1, line_width=0, fillcolor="#10b981", opacity=0.05)
-    fig.add_hrect(y0=-1, y1=0, line_width=0, fillcolor="#f43f5e", opacity=0.05)
-
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#94a3b8', family='Inter, sans-serif'),
-                xaxis=dict(
-            title=dict(text=f'Call Timeline - Total Duration: {format_duration(call_duration_val)}', font=dict(color='#64748b')),
-            showgrid=True,
-            gridcolor='#334155',
-            color='#64748b',
-            linecolor='#334155',
-            zeroline=False,
-            range=[0, max(time_points) * 1.05] if time_points and max(time_points) > 0 else [0, 10],
-            # Format x-axis ticks as minutes
-            tickmode='array',
-            tickvals=[i * 60 for i in range(int(effective_duration // 60) + 1)] if effective_duration > 0 else None,
-            ticktext=[f"{i}:00" for i in range(int(effective_duration // 60) + 1)] if effective_duration > 0 else None,
-        ),
-        yaxis=dict(
-            title=dict(text='Sentiment Score', font=dict(color='#64748b')),
-            range=[-100, 100],
-            showgrid=True,
-            gridcolor='#334155',
-            color='#64748b',
-            linecolor='#334155',
-            tickmode='array',
-            tickvals=[-100, -50, 0, 50, 100],
-            ticktext=['Very Negative<br>(-100)', 'Negative<br>(-50)', 'Neutral<br>(0)', 'Positive<br>(50)', 'Very Positive<br>(100)']
-        ),
-        legend=dict(
-            orientation='h',
-            yanchor='bottom',
-            y=1.02,
-            xanchor='right',
-            x=1,
-            font=dict(color='#f8fafc', size=12),
-            bgcolor='rgba(30, 41, 59, 0.8)',
-            bordercolor='#334155',
-            borderwidth=1
-        ),
-        hovermode="x unified",
-        margin=dict(l=80, r=120, t=100, b=60),
-        height=450
-    )
-
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col_right:
-
-    # Dropdown to select Agent or Customer
-    sentiment_view = st.selectbox("View Sentiment For", ["Agent", "Customer"], key="sentiment_dist_select")
-
-    # Get the appropriate sentiment data based on selection
-    if sentiment_view == "Agent":
-        sentiment_data = agent_sent.get('distribution', {})
-        center_text = "Agent"
-        primary_color = "#6366f1"
-    else:
-        sentiment_data = cust_sent.get('distribution', {})
-        center_text = "Customer"
-        primary_color = "#f59e0b"
-
-    st.markdown(f'<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">🎯 Sentiment Distribution - {sentiment_view}</div>', unsafe_allow_html=True)
-
-    if sentiment_data:
-        # Ensure all sentiment categories are present
-        full_sentiment_data = {"Positive": 0, "Neutral": 0, "Negative": 0}
-        for key, value in sentiment_data.items():
-            if key.lower() == "positive":
-                full_sentiment_data["Positive"] = value
-            elif key.lower() == "negative":
-                full_sentiment_data["Negative"] = value
-            else:
-                full_sentiment_data["Neutral"] = value
-
-        color_map = {"Positive": "#10b981", "Neutral": "#6366f1", "Negative": "#f43f5e"}
-        labels = list(full_sentiment_data.keys())
-        values = list(full_sentiment_data.values())
-
-        # Create donut chart with improved styling - FIXED labels and legend position
-        fig_pie = go.Figure(data=[go.Pie(
-            values=values,
-            labels=labels,
-            hole=0.6,
-            marker=dict(
-                colors=[color_map[label] for label in labels],
-                line=dict(color='#1e293b', width=3)
-            ),
-            # FIXED: Move labels inside the pie slices to avoid cutoff
-            textinfo='label+percent',
-            textposition='inside',
-            textfont=dict(color='#f8fafc', size=11, family='Inter, sans-serif'),
-            insidetextorientation='horizontal',
-            hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
-        )])
-
-        # Update layout with legend at top right - ABOVE the chart
-        fig_pie.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#f8fafc', family='Inter, sans-serif'),
-            showlegend=True,
-            legend=dict(
-                orientation='h',  # Horizontal layout
-                yanchor='bottom',  # Anchor to bottom of legend
-                y=1.15,  # Position ABOVE the chart (y > 1)
-                xanchor='right',  # Anchor to right
-                x=1,  # Right position
-                font=dict(color='#f8fafc', size=12),
-                bgcolor='rgba(30, 41, 59, 0.8)',
-                bordercolor='#334155',
-                borderwidth=1
-            ),
-            margin=dict(l=20, r=20, t=80, b=20),  # Increased top margin for legend
-            height=350,
-            annotations=[
-                dict(
-                    text=f'<b>{center_text}</b><br>Sentiment',
-                    x=0.5, y=0.5,
-                    font_size=14,
-                    showarrow=False,
-                    font=dict(color='#f8fafc', family='Inter, sans-serif')
-                )
-            ]
-        )
-
-        st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
-
-        # Add summary statistics below the chart
-        total_segments = sum(values)
-        if total_segments > 0:
-            pos_pct = (full_sentiment_data["Positive"] / total_segments) * 100
-            neg_pct = (full_sentiment_data["Negative"] / total_segments) * 100
-
-            st.markdown(f"""
-            <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid #334155;">
-                <div style="text-align: center; flex: 1;">
-                    <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Positive</div>
-                    <div style="font-size: 18px; font-weight: 700; color: #10b981;">{pos_pct:.1f}%</div>
-                </div>
-                <div style="text-align: center; flex: 1; border-left: 1px solid #334155; border-right: 1px solid #334155;">
-                    <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Neutral</div>
-                    <div style="font-size: 18px; font-weight: 700; color: #6366f1;">{(full_sentiment_data["Neutral"] / total_segments) * 100:.1f}%</div>
-                </div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Negative</div>
-                    <div style="font-size: 18px; font-weight: 700; color: #f43f5e;">{neg_pct:.1f}%</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("No distribution data available")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Bottom Section - Executive Summary & Risk Analysis
-st.markdown("<br>", unsafe_allow_html=True)
-col_bottom_left, col_bottom_right = st.columns([1, 2])
-
-with col_bottom_left:
-    # Monthly Performance (placeholder using bar chart with emotion confidence)
-    st.markdown('<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">Emotion Analysis</div>', unsafe_allow_html=True)
-
-    fig_bar = go.Figure(data=[go.Bar(
-        x=['Agent', 'Customer'],
-        y=[agent_emotion_conf, cust_emotion_conf],
-        marker_color=['#6366f1', '#f59e0b'],
-        text=[f"{agent_emotion_label}<br>{agent_emotion_conf:.0%}", f"{cust_emotion_label}<br>{cust_emotion_conf:.0%}"],
-        textposition='auto',
-        textfont=dict(color='#f8fafc', size=11))]
-    )
-
-
-    fig_bar.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#94a3b8'),
-        xaxis=dict(showgrid=False, color='#64748b'),
-        yaxis=dict(showgrid=True, gridcolor='#334155', color='#64748b', range=[0, 1], tickformat='.0%'),
-        margin=dict(l=40, r=20, t=20, b=40),
-        height=280,
-        showlegend=False
-    )
-
-    st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col_bottom_right:
-    # Executive Summary & Risk Table
-    st.markdown('<div class="custom-table">', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="table-header">
-        <span style="font-size: 16px; font-weight: 600; color: #f8fafc;">Executive Summary & Risk Analysis</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Summary text
-    if exec_summary:
-        st.markdown(f"""
-        <div style="padding: 20px 24px; border-bottom: 1px solid #334155; line-height: 1.7; color: #cbd5e1; font-size: 14px;">
-            {exec_summary.replace(chr(10), '<br>')}
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Risk indicators row
-    cols = st.columns(3)
-    with cols[0]:
-        comp_badge = "badge-positive" if compliance_risk == "Low" else "badge-warning" if compliance_risk == "Medium" else "badge-negative"
-        st.markdown(f"""
-        <div style="text-align: center; padding: 16px;">
-            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Compliance Risk</div>
-            <span class="badge {comp_badge}" style="font-size: 14px; padding: 8px 16px;">{compliance_risk}</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with cols[1]:
-        issue_badge = "badge-negative" if issue_detected else "badge-positive"
-        issue_text = "Yes" if issue_detected else "No"
-        st.markdown(f"""
-        <div style="text-align: center; padding: 16px; border-left: 1px solid #334155; border-right: 1px solid #334155;">
-            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Issue Detected</div>
-            <span class="badge {issue_badge}" style="font-size: 14px; padding: 8px 16px;">{issue_text}</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with cols[2]:
-        emotion_badge = "badge-neutral"
-        st.markdown(f"""
-        <div style="text-align: center; padding: 16px;">
-            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Dominant Emotion</div>
-            <span class="badge {emotion_badge}" style="font-size: 14px; padding: 8px 16px; text-transform: capitalize;">{dominant_emotion}</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Explanation
-    st.markdown(f"""
-    <div style="padding: 16px 24px; background: #0f172a; border-top: 1px solid #334155;">
-        <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Analysis Explanation</div>
-        <div style="color: #94a3b8; font-size: 13px; line-height: 1.6;">{sentiment_explanation}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Entities Section
-if orgs or persons or locations:
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-header">Detected Entities</div>', unsafe_allow_html=True)
-
-    cols = st.columns(3)
-
-    with cols[0]:
-        st.markdown('<div class="data-label" style="margin-bottom: 12px;">Organizations</div>', unsafe_allow_html=True)
-        if orgs:
-            for org in orgs:
-                st.markdown(f'<span class="entity-tag entity-org">{org}</span>', unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
-
-    with cols[1]:
-        st.markdown('<div class="data-label" style="margin-bottom: 12px;">Persons</div>', unsafe_allow_html=True)
-        if persons:
-            for person in persons:
-                st.markdown(f'<span class="entity-tag entity-person">{person}</span>', unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
-
-    with cols[2]:
-        st.markdown('<div class="data-label" style="margin-bottom: 12px;">Locations</div>', unsafe_allow_html=True)
-        if locations:
-            for loc in locations:
-                st.markdown(f'<span class="entity-tag entity-location">{loc}</span>', unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
-
-# Transcription
-# ============================================================
-# AUDIO PLAYER - Call Recording from S3
-# ============================================================
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown('<div class="section-header">🔊 Call Recording</div>', unsafe_allow_html=True)
-
-audio_bytes = load_audio_from_s3(call_id)
-
-if audio_bytes:
-    st.markdown("""
-    <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-            <div style="width:36px;height:36px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;">🎧</div>
-            <div>
-                <div style="font-size:15px;font-weight:600;color:#f8fafc;">Listen to Call</div>
-                <div style="font-size:12px;color:#64748b;">Streaming from S3</div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.audio(audio_bytes, format="audio/mp3")
-else:
-    st.info("🎧 No recording available for this call")
+# # Get duration from call_records_test table (conversation_duration column) - PRIORITY 1
+# conversation_duration_sec = get_conversation_duration(call_id)
+
+# # Fallback to metadata duration from call_json - PRIORITY 2
+# call_meta = data.get("metadata", {})
+# metadata_duration = call_meta.get("call_duration_sec", 0)
+
+# # PRIORITY ORDER: Database value > Metadata value > Default
+# if conversation_duration_sec > 0:
+#     call_duration_val = conversation_duration_sec
+#     duration_source = "Database"
+# elif isinstance(metadata_duration, (int, float)) and metadata_duration > 0:
+#     call_duration_val = float(metadata_duration)
+#     duration_source = "Metadata"
+# elif isinstance(metadata_duration, str) and ':' in metadata_duration:
+#     try:
+#         parts = metadata_duration.split(':')
+#         if len(parts) == 3:  # HH:MM:SS
+#             call_duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+#         elif len(parts) == 2:  # MM:SS
+#             call_duration_val = int(parts[0]) * 60 + int(parts[1])
+#         else:
+#             call_duration_val = float(metadata_duration) if metadata_duration else 0
+#         duration_source = "Metadata (parsed)"
+#     except:
+#         call_duration_val = 0
+#         duration_source = "Default"
+# else:
+#     try:
+#         call_duration_val = float(metadata_duration) if metadata_duration else 0
+#         duration_source = "Metadata" if call_duration_val > 0 else "Default"
+#     except:
+#         call_duration_val = 0
+#         duration_source = "Default"
+
+# # Ensure duration is never negative and is float
+# call_duration_val = max(0.0, float(call_duration_val))
+
+# utterances = data['metadata'].get('utterances', {})
+# agent_utt = utterances.get('agent', 0)
+# cust_utt = utterances.get('customer', 0)
+# total_utt = agent_utt + cust_utt
+# agent_pct = (agent_utt / total_utt * 100) if total_utt else 0
+
+# # Emotion data
+# agent_emotion = data.get("emotion", {}).get("agent", {})
+# cust_emotion = data.get("emotion", {}).get("customer", {})
+# agent_emotion_conf = agent_emotion.get("confidence", 0)
+# cust_emotion_conf = cust_emotion.get("confidence", 0)
+# agent_emotion_label = agent_emotion.get("dominant_emotion", "neutral")
+# cust_emotion_label = cust_emotion.get("dominant_emotion", "neutral")
+
+# # Sentiment data - NOW SCALED DOWN in get_normalized()
+# agent_sent = data.get("sentiment", {}).get("agent", {})
+# cust_sent = data.get("sentiment", {}).get("customer", {})
+# agent_norm = get_normalized(agent_sent)
+# cust_norm = get_normalized(cust_sent)
+
+# # Advanced insights
+# advanced = data.get("advanced_insights", {})
+# primary_intent = advanced.get("primary_intent", "N/A")
+# intent_strength = advanced.get("customer_intent_strength", "N/A")
+# resolution_status = advanced.get("resolution_status", "N/A")
+# repeat_risk = advanced.get("repeat_call_risk", "N/A")
+# compliance_risk = advanced.get("compliance_risk", "N/A")
+# issue_detected = advanced.get("issue_detected", False)
+# dominant_emotion = advanced.get("dominant_customer_emotion", "N/A")
+# sentiment_explanation = advanced.get("sentiment_explanation", "N/A")
+
+# # Entities
+# entities = data.get("entities", {})
+# orgs = entities.get("orgs", [])
+# persons = entities.get("persons", [])
+# locations = entities.get("locations", [])
+
+# # Executive summary
+# exec_summary = data.get("executive_summary", "")
+
+# # KPI Cards - Top Row
+# st.markdown("<div style='margin: 24px 0;'>", unsafe_allow_html=True)
+# cols = st.columns(4)
+
+# metrics = [
+#     {"icon": "🎙️", "label": "Agent Utterances", "value": str(agent_utt), "sub": f"{agent_pct:.1f}% of conversation"},
+#     {"icon": "💬", "label": "Customer Utterances", "value": str(cust_utt), "sub": f"{100-agent_pct:.1f}% of conversation"},
+#     {"icon": "😊", "label": "Agent Sentiment", "value": f"{agent_norm:+.0f}", "sub": agent_emotion_label},
+#     {"icon": "⏱️", "label": "Call Duration", "value": format_duration(call_duration_val), "sub": f"{call_duration_val:.0f}s ({duration_source})" if call_duration_val > 0 else "N/A"}]
+
+# for i, metric in enumerate(metrics):
+#     with cols[i]:
+#         st.markdown(f"""
+#         <div class="metric-card">
+#             <div class="metric-icon">{metric['icon']}</div>
+#             <div class="metric-value">{metric['value']}</div>
+#             <div class="metric-label">{metric['label']}</div>
+#             <div style="font-size: 12px; color: #64748b;">{metric['sub']}</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+# st.markdown("</div>", unsafe_allow_html=True)
+
+# # Second Row - Customer Metrics & Emotion
+# cols = st.columns(4)
+
+# with cols[0]:
+#     cust_label = executive_sentiment_label(cust_norm)
+#     trend_class = "trend-up" if cust_norm > 0.2 else "trend-down" if cust_norm < -0.2 else "trend-neutral"
+#     st.markdown(f"""
+#     <div class="metric-card">
+#         <div class="metric-icon">🎯</div>
+#         <div class="metric-value">{cust_norm:+.0f}</div>
+#         <div class="metric-label">Customer Sentiment</div>
+#         <span class="metric-trend {trend_class}">{cust_label}</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# with cols[1]:
+#     vol_status = "Stable" if cust_emotion_conf < 0.2 else "Volatile"
+#     vol_class = "trend-up" if cust_emotion_conf < 0.2 else "trend-down"
+#     st.markdown(f"""
+#     <div class="metric-card">
+#         <div class="metric-icon">⚡</div>
+#         <div class="metric-value">{cust_emotion_conf:.0%}</div>
+#         <div class="metric-label">Emotion Confidence</div>
+#         <span class="metric-trend {vol_class}">{vol_status}</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# with cols[2]:
+#     intent_badge = "badge-positive" if intent_strength == "High" else "badge-warning" if intent_strength == "Medium" else "badge-neutral"
+#     st.markdown(f"""
+#     <div class="metric-card">
+#         <div class="metric-icon">🎯</div>
+#         <div class="metric-value" style="font-size: 18px;">{primary_intent}</div>
+#         <div class="metric-label">Primary Intent</div>
+#         <span class="badge {intent_badge}">{intent_strength}</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# with cols[3]:
+#     risk_badge = "badge-positive" if repeat_risk == "Low" else "badge-warning" if repeat_risk == "Medium" else "badge-negative"
+#     st.markdown(f"""
+#     <div class="metric-card">
+#         <div class="metric-icon">🔄</div>
+#         <div class="metric-value" style="font-size: 18px;">{repeat_risk}</div>
+#         <div class="metric-label">Repeat Call Risk</div>
+#         <span class="badge {risk_badge}">{resolution_status}</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# # Charts Section - Two Columns
+# st.markdown("<br>", unsafe_allow_html=True)
+# col_left, col_right = st.columns([2, 1])
+
+# with col_left:
+#     # IMPROVED Sentiment Trend Chart - Management Friendly
+#     st.markdown('<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">📈 Sentiment Flow During Call</div>', unsafe_allow_html=True)
+
+#     # Add explanation for management
+#     st.markdown("""
+#     <div style="background: #0f172a; border-left: 3px solid #6366f1; padding: 12px 16px; margin-bottom: 16px; border-radius: 0 8px 8px 0;">
+#         <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+#             <strong style="color: #f8fafc;">How to read:</strong> This chart shows sentiment changes throughout the call.
+#             <span style="color: #6366f1;">● Agent</span> (blue) and <span style="color: #f59e0b;">● Customer</span> (orange).
+#             Values above 0 = Positive, Below 0 = Negative. The closer to +1 or -1, the stronger the sentiment.
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     # CHANGED: Now uses get_drift() which scales down from -100/+100 to -1/+1
+#     agent_drift = get_drift(agent_sent)
+#     cust_drift = get_drift(cust_sent)
+
+#     if len(agent_drift) == 0:
+#         agent_drift = [0]
+#     if len(cust_drift) == 0:
+#         cust_drift = [0]
+
+#     max_len = max(len(agent_drift), len(cust_drift))
+#     if len(agent_drift) < max_len:
+#         agent_drift += [agent_drift[-1]] * (max_len - len(agent_drift))
+#     if len(cust_drift) < max_len:
+#         cust_drift += [cust_drift[-1]] * (max_len - len(cust_drift))
+
+#     # ============================================================
+#     # FIXED: Proper time point calculation using actual conversation duration
+#     # ============================================================
+#         # ============================================================
+#     # FIXED: Proper time point calculation using actual conversation duration
+#     # ============================================================
+
+#     # Get the chunk duration from sentiment data (default to 10 seconds if not found)
+#     agent_chunk_duration = agent_sent.get('chunk_duration_sec', 10)
+#     cust_chunk_duration = cust_sent.get('chunk_duration_sec', 10)
+#     chunk_duration = max(agent_chunk_duration, cust_chunk_duration, 1)  # At least 1 second
+
+#     # Use actual conversation duration from database, fallback to calculated duration
+#     effective_duration = call_duration_val if call_duration_val > 0 else (max_len * chunk_duration)
+
+#     # Calculate time points based on actual call duration
+#     if max_len == 1:
+#         time_points = [0]
+#     else:
+#         # Distribute chunks evenly across the actual call duration
+#         time_points = [round(i * effective_duration / (max_len - 1), 1) for i in range(max_len)]
+
+#     # Ensure no negative values
+#     time_points = [max(0.0, float(t)) for t in time_points]
+
+#     # Create improved trend chart with filled areas
+#     fig = go.Figure()
+
+#     # Add filled area under lines for better visualization
+#     fig.add_trace(go.Scatter(
+#         x=time_points,
+#         y=agent_drift,
+#         mode="lines+markers",
+#         name="Agent",
+#         line=dict(color='#6366f1', width=3),
+#         marker=dict(size=8, color='#6366f1', line=dict(color='#1e293b', width=2)),
+#         fill='tozeroy',
+#         fillcolor='rgba(99, 102, 241, 0.1)'
+#     ))
+
+#     fig.add_trace(go.Scatter(
+#         x=time_points,
+#         y=cust_drift,
+#         mode="lines+markers",
+#         name="Customer",
+#         line=dict(color='#f59e0b', width=3),
+#         marker=dict(size=8, color='#f59e0b', line=dict(color='#1e293b', width=2)),
+#         fill='tozeroy',
+#         fillcolor='rgba(245, 158, 11, 0.1)'
+#     ))
+
+#     # Add reference lines
+#     fig.add_hline(y=0, line_dash="solid", line_color="#475569", line_width=2,
+#                   annotation_text="Neutral", annotation_position="right",
+#                   annotation_font_color="#94a3b8")
+#     fig.add_hline(y=50, line_dash="dash", line_color="#10b981", line_width=1,
+#                   annotation_text="Positive Threshold", annotation_position="right",
+#                   annotation_font_color="#10b981", annotation_font_size=10)
+#     fig.add_hline(y=-50, line_dash="dash", line_color="#f43f5e", line_width=1,
+#                   annotation_text="Negative Threshold", annotation_position="right",
+#                   annotation_font_color="#f43f5e", annotation_font_size=10)
+
+#     # Add shaded regions for positive/negative zones
+#     fig.add_hrect(y0=0, y1=1, line_width=0, fillcolor="#10b981", opacity=0.05)
+#     fig.add_hrect(y0=-1, y1=0, line_width=0, fillcolor="#f43f5e", opacity=0.05)
+
+#     fig.update_layout(
+#         paper_bgcolor='rgba(0,0,0,0)',
+#         plot_bgcolor='rgba(0,0,0,0)',
+#         font=dict(color='#94a3b8', family='Inter, sans-serif'),
+#                 xaxis=dict(
+#             title=dict(text=f'Call Timeline - Total Duration: {format_duration(call_duration_val)}', font=dict(color='#64748b')),
+#             showgrid=True,
+#             gridcolor='#334155',
+#             color='#64748b',
+#             linecolor='#334155',
+#             zeroline=False,
+#             range=[0, max(time_points) * 1.05] if time_points and max(time_points) > 0 else [0, 10],
+#             # Format x-axis ticks as minutes
+#             tickmode='array',
+#             tickvals=[i * 60 for i in range(int(effective_duration // 60) + 1)] if effective_duration > 0 else None,
+#             ticktext=[f"{i}:00" for i in range(int(effective_duration // 60) + 1)] if effective_duration > 0 else None,
+#         ),
+#         yaxis=dict(
+#             title=dict(text='Sentiment Score', font=dict(color='#64748b')),
+#             range=[-100, 100],
+#             showgrid=True,
+#             gridcolor='#334155',
+#             color='#64748b',
+#             linecolor='#334155',
+#             tickmode='array',
+#             tickvals=[-100, -50, 0, 50, 100],
+#             ticktext=['Very Negative<br>(-100)', 'Negative<br>(-50)', 'Neutral<br>(0)', 'Positive<br>(50)', 'Very Positive<br>(100)']
+#         ),
+#         legend=dict(
+#             orientation='h',
+#             yanchor='bottom',
+#             y=1.02,
+#             xanchor='right',
+#             x=1,
+#             font=dict(color='#f8fafc', size=12),
+#             bgcolor='rgba(30, 41, 59, 0.8)',
+#             bordercolor='#334155',
+#             borderwidth=1
+#         ),
+#         hovermode="x unified",
+#         margin=dict(l=80, r=120, t=100, b=60),
+#         height=450
+#     )
+
+#     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+#     st.markdown('</div>', unsafe_allow_html=True)
+
+# with col_right:
+
+#     # Dropdown to select Agent or Customer
+#     sentiment_view = st.selectbox("View Sentiment For", ["Agent", "Customer"], key="sentiment_dist_select")
+
+#     # Get the appropriate sentiment data based on selection
+#     if sentiment_view == "Agent":
+#         sentiment_data = agent_sent.get('distribution', {})
+#         center_text = "Agent"
+#         primary_color = "#6366f1"
+#     else:
+#         sentiment_data = cust_sent.get('distribution', {})
+#         center_text = "Customer"
+#         primary_color = "#f59e0b"
+
+#     st.markdown(f'<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">🎯 Sentiment Distribution - {sentiment_view}</div>', unsafe_allow_html=True)
+
+#     if sentiment_data:
+#         # Ensure all sentiment categories are present
+#         full_sentiment_data = {"Positive": 0, "Neutral": 0, "Negative": 0}
+#         for key, value in sentiment_data.items():
+#             if key.lower() == "positive":
+#                 full_sentiment_data["Positive"] = value
+#             elif key.lower() == "negative":
+#                 full_sentiment_data["Negative"] = value
+#             else:
+#                 full_sentiment_data["Neutral"] = value
+
+#         color_map = {"Positive": "#10b981", "Neutral": "#6366f1", "Negative": "#f43f5e"}
+#         labels = list(full_sentiment_data.keys())
+#         values = list(full_sentiment_data.values())
+
+#         # Create donut chart with improved styling - FIXED labels and legend position
+#         fig_pie = go.Figure(data=[go.Pie(
+#             values=values,
+#             labels=labels,
+#             hole=0.6,
+#             marker=dict(
+#                 colors=[color_map[label] for label in labels],
+#                 line=dict(color='#1e293b', width=3)
+#             ),
+#             # FIXED: Move labels inside the pie slices to avoid cutoff
+#             textinfo='label+percent',
+#             textposition='inside',
+#             textfont=dict(color='#f8fafc', size=11, family='Inter, sans-serif'),
+#             insidetextorientation='horizontal',
+#             hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}<extra></extra>'
+#         )])
+
+#         # Update layout with legend at top right - ABOVE the chart
+#         fig_pie.update_layout(
+#             paper_bgcolor='rgba(0,0,0,0)',
+#             plot_bgcolor='rgba(0,0,0,0)',
+#             font=dict(color='#f8fafc', family='Inter, sans-serif'),
+#             showlegend=True,
+#             legend=dict(
+#                 orientation='h',  # Horizontal layout
+#                 yanchor='bottom',  # Anchor to bottom of legend
+#                 y=1.15,  # Position ABOVE the chart (y > 1)
+#                 xanchor='right',  # Anchor to right
+#                 x=1,  # Right position
+#                 font=dict(color='#f8fafc', size=12),
+#                 bgcolor='rgba(30, 41, 59, 0.8)',
+#                 bordercolor='#334155',
+#                 borderwidth=1
+#             ),
+#             margin=dict(l=20, r=20, t=80, b=20),  # Increased top margin for legend
+#             height=350,
+#             annotations=[
+#                 dict(
+#                     text=f'<b>{center_text}</b><br>Sentiment',
+#                     x=0.5, y=0.5,
+#                     font_size=14,
+#                     showarrow=False,
+#                     font=dict(color='#f8fafc', family='Inter, sans-serif')
+#                 )
+#             ]
+#         )
+
+#         st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
+
+#         # Add summary statistics below the chart
+#         total_segments = sum(values)
+#         if total_segments > 0:
+#             pos_pct = (full_sentiment_data["Positive"] / total_segments) * 100
+#             neg_pct = (full_sentiment_data["Negative"] / total_segments) * 100
+
+#             st.markdown(f"""
+#             <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid #334155;">
+#                 <div style="text-align: center; flex: 1;">
+#                     <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Positive</div>
+#                     <div style="font-size: 18px; font-weight: 700; color: #10b981;">{pos_pct:.1f}%</div>
+#                 </div>
+#                 <div style="text-align: center; flex: 1; border-left: 1px solid #334155; border-right: 1px solid #334155;">
+#                     <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Neutral</div>
+#                     <div style="font-size: 18px; font-weight: 700; color: #6366f1;">{(full_sentiment_data["Neutral"] / total_segments) * 100:.1f}%</div>
+#                 </div>
+#                 <div style="text-align: center; flex: 1;">
+#                     <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Negative</div>
+#                     <div style="font-size: 18px; font-weight: 700; color: #f43f5e;">{neg_pct:.1f}%</div>
+#                 </div>
+#             </div>
+#             """, unsafe_allow_html=True)
+#     else:
+#         st.info("No distribution data available")
+
+#     st.markdown('</div>', unsafe_allow_html=True)
+
+# # Bottom Section - Executive Summary & Risk Analysis
+# st.markdown("<br>", unsafe_allow_html=True)
+# col_bottom_left, col_bottom_right = st.columns([1, 2])
+
+# with col_bottom_left:
+#     # Monthly Performance (placeholder using bar chart with emotion confidence)
+#     st.markdown('<div style="font-size: 16px; font-weight: 600; color: #f8fafc; margin-bottom: 20px;">Emotion Analysis</div>', unsafe_allow_html=True)
+
+#     fig_bar = go.Figure(data=[go.Bar(
+#         x=['Agent', 'Customer'],
+#         y=[agent_emotion_conf, cust_emotion_conf],
+#         marker_color=['#6366f1', '#f59e0b'],
+#         text=[f"{agent_emotion_label}<br>{agent_emotion_conf:.0%}", f"{cust_emotion_label}<br>{cust_emotion_conf:.0%}"],
+#         textposition='auto',
+#         textfont=dict(color='#f8fafc', size=11))]
+#     )
+
+#     fig_bar.update_layout(
+#         paper_bgcolor='rgba(0,0,0,0)',
+#         plot_bgcolor='rgba(0,0,0,0)',
+#         font=dict(color='#94a3b8'),
+#         xaxis=dict(showgrid=False, color='#64748b'),
+#         yaxis=dict(showgrid=True, gridcolor='#334155', color='#64748b', range=[0, 1], tickformat='.0%'),
+#         margin=dict(l=40, r=20, t=20, b=40),
+#         height=280,
+#         showlegend=False
+#     )
+
+#     st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
+#     st.markdown('</div>', unsafe_allow_html=True)
+
+# with col_bottom_right:
+#     # Executive Summary & Risk Table
+#     st.markdown('<div class="custom-table">', unsafe_allow_html=True)
+#     st.markdown("""
+#     <div class="table-header">
+#         <span style="font-size: 16px; font-weight: 600; color: #f8fafc;">Executive Summary & Risk Analysis</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     # Summary text
+#     if exec_summary:
+#         st.markdown(f"""
+#         <div style="padding: 20px 24px; border-bottom: 1px solid #334155; line-height: 1.7; color: #cbd5e1; font-size: 14px;">
+#             {exec_summary.replace(chr(10), '<br>')}
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     # Risk indicators row
+#     cols = st.columns(3)
+#     with cols[0]:
+#         comp_badge = "badge-positive" if compliance_risk == "Low" else "badge-warning" if compliance_risk == "Medium" else "badge-negative"
+#         st.markdown(f"""
+#         <div style="text-align: center; padding: 16px;">
+#             <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Compliance Risk</div>
+#             <span class="badge {comp_badge}" style="font-size: 14px; padding: 8px 16px;">{compliance_risk}</span>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with cols[1]:
+#         issue_badge = "badge-negative" if issue_detected else "badge-positive"
+#         issue_text = "Yes" if issue_detected else "No"
+#         st.markdown(f"""
+#         <div style="text-align: center; padding: 16px; border-left: 1px solid #334155; border-right: 1px solid #334155;">
+#             <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Issue Detected</div>
+#             <span class="badge {issue_badge}" style="font-size: 14px; padding: 8px 16px;">{issue_text}</span>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with cols[2]:
+#         emotion_badge = "badge-neutral"
+#         st.markdown(f"""
+#         <div style="text-align: center; padding: 16px;">
+#             <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Dominant Emotion</div>
+#             <span class="badge {emotion_badge}" style="font-size: 14px; padding: 8px 16px; text-transform: capitalize;">{dominant_emotion}</span>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     # Explanation
+#     st.markdown(f"""
+#     <div style="padding: 16px 24px; background: #0f172a; border-top: 1px solid #334155;">
+#         <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Analysis Explanation</div>
+#         <div style="color: #94a3b8; font-size: 13px; line-height: 1.6;">{sentiment_explanation}</div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     st.markdown('</div>', unsafe_allow_html=True)
+
+# # Entities Section
+# if orgs or persons or locations:
+#     st.markdown("<br>", unsafe_allow_html=True)
+#     st.markdown('<div class="section-header">Detected Entities</div>', unsafe_allow_html=True)
+
+#     cols = st.columns(3)
+
+#     with cols[0]:
+#         st.markdown('<div class="data-label" style="margin-bottom: 12px;">Organizations</div>', unsafe_allow_html=True)
+#         if orgs:
+#             for org in orgs:
+#                 st.markdown(f'<span class="entity-tag entity-org">{org}</span>', unsafe_allow_html=True)
+#         else:
+#             st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
+
+#     with cols[1]:
+#         st.markdown('<div class="data-label" style="margin-bottom: 12px;">Persons</div>', unsafe_allow_html=True)
+#         if persons:
+#             for person in persons:
+#                 st.markdown(f'<span class="entity-tag entity-person">{person}</span>', unsafe_allow_html=True)
+#         else:
+#             st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
+
+#     with cols[2]:
+#         st.markdown('<div class="data-label" style="margin-bottom: 12px;">Locations</div>', unsafe_allow_html=True)
+#         if locations:
+#             for loc in locations:
+#                 st.markdown(f'<span class="entity-tag entity-location">{loc}</span>', unsafe_allow_html=True)
+#         else:
+#             st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
+
+# # Transcription
+# # ============================================================
+# # AUDIO PLAYER - Call Recording from S3
+# # ============================================================
+# st.markdown("<br>", unsafe_allow_html=True)
+# st.markdown('<div class="section-header">🔊 Call Recording</div>', unsafe_allow_html=True)
+
+# audio_bytes = load_audio_from_s3(call_id)
+
+# if audio_bytes:
+#     st.markdown("""
+#     <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;">
+#         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+#             <div style="width:36px;height:36px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;">🎧</div>
+#             <div>
+#                 <div style="font-size:15px;font-weight:600;color:#f8fafc;">Listen to Call</div>
+#                 <div style="font-size:12px;color:#64748b;">Streaming from S3</div>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+#     st.audio(audio_bytes, format="audio/mp3")
+# else:
+#     st.info("🎧 No recording available for this call")
 
 # ============================================================
 # FULL CALL TRANSCRIPTION
@@ -1909,54 +1910,53 @@ with st.expander("View Transcription", expanded=False):
     else:
         st.info("No transcription found for this call.")
 
-# Ask AI Section
+# # Ask AI Section
 
+# selected_call_id = st.session_state.get("selected_call_id")
 
-selected_call_id = st.session_state.get("selected_call_id")
+# st.markdown("<br>", unsafe_allow_html=True)
+# st.markdown('<div class="section-header">Ask AI About This Call</div>', unsafe_allow_html=True)
+# # Add CSS to make placeholder text visible
+# st.markdown("""
+# <style>
+#     /* Make placeholder text visible */
+#     div[data-testid="stTextInput"] input::placeholder {
+#         color: #94a3b8 !important;  /* Light gray color */
+#         opacity: 1 !important;       /* Full opacity */
+#         font-size: 14px !important;  /* Slightly larger */
+#         font-weight: 500 !important; /* Medium weight */
+#     }
 
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown('<div class="section-header">Ask AI About This Call</div>', unsafe_allow_html=True)
-# Add CSS to make placeholder text visible
-st.markdown("""
-<style>
-    /* Make placeholder text visible */
-    div[data-testid="stTextInput"] input::placeholder {
-        color: #94a3b8 !important;  /* Light gray color */
-        opacity: 1 !important;       /* Full opacity */
-        font-size: 14px !important;  /* Slightly larger */
-        font-weight: 500 !important; /* Medium weight */
-    }
+#     /* Ensure input text is also visible */
+#     div[data-testid="stTextInput"] input {
+#         color: #f8fafc !important;  /* White text */
+#         font-size: 14px !important;
+#     }
+# </style>
+# """, unsafe_allow_html=True)
+# if selected_call_id:
+#     question = st.text_input("Ask anything about this call", placeholder="Why was the customer unhappy?")
 
-    /* Ensure input text is also visible */
-    div[data-testid="stTextInput"] input {
-        color: #f8fafc !important;  /* White text */
-        font-size: 14px !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-if selected_call_id:
-    question = st.text_input("Ask anything about this call", placeholder="Why was the customer unhappy?")
+#     if st.button("Ask AI", key="ask_ai_btn"):
+#         if question:
+#             with st.spinner("AI analyzing call..."):
+#                 try:
+#                     response = requests.post(
+#                         "http://localhost:8000/ask_call_ai",
+#                         json={"call_id": selected_call_id, "question": question}
+#                     )
 
-    if st.button("Ask AI", key="ask_ai_btn"):
-        if question:
-            with st.spinner("AI analyzing call..."):
-                try:
-                    response = requests.post(
-                        "http://localhost:8000/ask_call_ai",
-                        json={"call_id": selected_call_id, "question": question}
-                    )
-
-                    if response.status_code == 200:
-                        answer = response.json()["answer"]
-                        st.markdown(f"""
-                        <div class="data-card" style="background: #334155; margin-top: 16px;">
-                            <div class="data-label">AI Response</div>
-                            <div style="color: #f8fafc; font-size: 15px; line-height: 1.6;">{answer}</div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    else:
-                        st.error("AI service failed")
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
+#                     if response.status_code == 200:
+#                         answer = response.json()["answer"]
+#                         st.markdown(f"""
+#                         <div class="data-card" style="background: #334155; margin-top: 16px;">
+#                             <div class="data-label">AI Response</div>
+#                             <div style="color: #f8fafc; font-size: 15px; line-height: 1.6;">{answer}</div>
+#                         </div>
+#                         """, unsafe_allow_html=True)
+#                     else:
+#                         st.error("AI service failed")
+#                 except Exception as e:
+#                     st.error(f"Error: {str(e)}")
 
 st.markdown("<div style='text-align: center; color: #64748b; padding: 40px 0 20px; font-size: 12px;'>© 2026 IndiaBondsAI Call Analytics</div>", unsafe_allow_html=True)
