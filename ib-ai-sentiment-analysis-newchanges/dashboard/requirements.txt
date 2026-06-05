@@ -1,0 +1,10 @@
+streamlit==1.52.2
+pandas
+plotly
+psycopg2-binary==2.9.11
+requests
+uvicorn[standard]==0.41.0
+click
+fastapi
+dotenv
+boto3==1.26.0

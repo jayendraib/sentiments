@@ -1,0 +1,16 @@
+psycopg2-binary==2.9.11
+#numpy==1.26.4
+#transformers==4.44.2
+ollama==0.6.1
+pydantic==2.12.5
+uvicorn[standard]==0.41.0
+click
+#torch==2.1.2
+fastapi==0.135.1
+#scipy==1.15.3
+#huggingface_hub==0.36.0
+tqdm
+click
+requests
+dotenv
+setuptools>=68.0.0

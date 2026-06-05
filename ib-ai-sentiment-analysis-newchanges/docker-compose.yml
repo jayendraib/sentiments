@@ -1,0 +1,133 @@
+services:
+
+  # ==================================================
+  # MAIN FASTAPI (your existing API inside project/api)
+  # ==================================================
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: main_api
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=${HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${USER}
+      - DB_PASSWORD=${PASSWORD}
+      - DB_PORT=${PORT}
+    volumes:
+      - torch_cache:/root/.cache/torch       
+      - hf_cache:/root/.cache/huggingface     
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_service
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - app-network
+
+
+  # ==================================================
+  # ANALYSIS SERVICE (runs background worker + AI Q&A)
+  # ==================================================
+  analysis:
+    build:
+      context: ./analysis
+      dockerfile: Dockerfile
+    container_name: analysis_service
+    env_file:
+      - ./.env
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_HOST=${HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${USER}
+      - DB_PASSWORD=${PASSWORD}
+      - DB_PORT=${PORT}
+      - HF_HOME=/app/.cache/huggingface
+      - OLLAMA_HOST=http://ollama:11434
+
+    volumes:
+      - analysis_torch_cache:/app/.cache/torch
+      - analysis_hf_cache:/app/.cache/huggingface
+    networks:
+      - app-network
+    depends_on:
+      - ollama
+    restart: always
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+  # ==================================================
+  # STREAMLIT DASHBOARD
+  # ==================================================
+  dashboard:
+
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: call_dashboard
+    env_file:
+      - ./.env 
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=${HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${USER}
+      - DB_PASSWORD=${PASSWORD}
+      - DB_PORT=${PORT}
+    networks:
+      - app-network
+    restart: always
+
+
+# ==================================================
+# VOLUMES
+# ==================================================
+volumes:
+  torch_cache:
+  hf_cache:
+  ollama_data:
+  analysis_torch_cache:
+  analysis_hf_cache:
+# ==================================================
+# NETWORK
+# ==================================================
+networks:
+  app-network:
+    driver: bridge 
