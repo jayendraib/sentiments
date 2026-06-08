@@ -116,6 +116,21 @@ services:
     restart: always
 
 
+  # ==================================================
+  # DBTODB SCHEDULER (runs daily at DBTODB_SCHEDULE_TIME IST)
+  # ==================================================
+  dbtodb:
+    build:
+      context: .
+      dockerfile: dbtodb.Dockerfile
+    container_name: dbtodb_scheduler
+    env_file:
+      - ./.env
+    networks:
+      - app-network
+    restart: always
+
+
 # ==================================================
 # VOLUMES
 # ==================================================
