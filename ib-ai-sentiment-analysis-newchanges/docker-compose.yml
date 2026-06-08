@@ -34,6 +34,7 @@ services:
 
 
   ollama:
+    profiles: [full]
     image: ollama/ollama:latest
     container_name: ollama_service
     volumes:
@@ -57,6 +58,7 @@ services:
   # ANALYSIS SERVICE (runs background worker + AI Q&A)
   # ==================================================
   analysis:
+    profiles: [full]
     build:
       context: ./analysis
       dockerfile: Dockerfile

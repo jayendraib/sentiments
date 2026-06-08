@@ -145,8 +145,6 @@ scheduler.add_job(
     name="DBtoDB daily sync",
 )
 
-next_run = scheduler.get_job("dbtodb_daily").next_run_time
 print(f"Scheduler running. DBtoDB will sync daily at {hour:02d}:{minute:02d} IST.")
-print(f"Next run: {next_run.astimezone(IST).strftime('%Y-%m-%d %H:%M:%S IST')}")
 
 scheduler.start()
