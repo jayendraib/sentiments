@@ -465,6 +465,15 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
+    /* Keep sidebar collapse/expand toggle visible even when header is hidden */
+    [data-testid="collapsedControl"] {
+        visibility: visible !important;
+        display: flex !important;
+    }
+    [data-testid="stSidebarCollapseButton"] {
+        visibility: visible !important;
+    }
+
     /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
@@ -925,18 +934,31 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
     # Navigation
-    nav_items = [
-        ("📊", "Dashboard", True)
-    ]
+    st.markdown("""
+    <style>
+    div[data-testid="stSidebar"] .stButton > button {
+        background: rgba(99, 102, 241, 0.1) !important;
+        color: #818cf8 !important;
+        border: none !important;
+        border-right: 3px solid #6366f1 !important;
+        border-radius: 8px !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 12px 16px !important;
+        width: 100% !important;
+    }
+    div[data-testid="stSidebar"] .stButton > button:hover {
+        background: #334155 !important;
+        color: #f8fafc !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    for icon, label, active in nav_items:
-        active_class = "active" if active else ""
-        st.markdown(f"""
-        <div class="nav-item {active_class}">
-            <span>{icon}</span>
-            <span>{label}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    if st.button("📊  Dashboard", key="nav_dashboard", use_container_width=True):
+        st.session_state.show_main_dashboard = False
+        st.session_state.selected_call = None
+        st.rerun()
 
 # ============================================================
 # FIRST DASHBOARD - AGENT PERFORMANCE OVERVIEW
@@ -961,7 +983,7 @@ if not st.session_state.show_main_dashboard:
             st.session_state.selected_date = available_dates[-1]  # Default to most recent
 
     # Top Header - NOW create columns after data is loaded
-    col1, col2, col3 = st.columns([2, 2, 1])
+    col1, col2, col3, col4 = st.columns([2, 1.5, 1, 0.8])
 
     with col1:
         st.markdown("""
@@ -1029,6 +1051,16 @@ if not st.session_state.show_main_dashboard:
                 st.session_state.selected_date = selected_date
         else:
             st.session_state.selected_date = "All"
+
+    with col4:
+        st.markdown("<div style='padding-top: 22px;'>", unsafe_allow_html=True)
+        if st.button("🔄 Refresh", key="overview_refresh", use_container_width=True):
+            st.cache_data.clear()
+            st.session_state.agent_summary_df = None
+            st.session_state.data = None
+            st.session_state.last_refresh = datetime.now()
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1180,11 +1212,14 @@ if st.session_state.selected_call is None:
     with col2:
         st.markdown("<h1 style='margin: 0; font-size: 24px;'>Call Analysis Dashboard</h1>", unsafe_allow_html=True)
 
-        with col3:
-            st.markdown("""
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-            </div>
-            """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("<div style='padding-top: 8px;'>", unsafe_allow_html=True)
+        if st.button("🔄 Refresh", key="calls_refresh", use_container_width=True):
+            st.cache_data.clear()
+            st.session_state.data = None
+            st.session_state.last_refresh = datetime.now()
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
     calls = load_all_calls()
     rows = []
