@@ -15,7 +15,7 @@ services:
     environment:
       - DB_HOST=${HOST}
       - DB_NAME=${DB_NAME}
-      - DB_USER=${USER}
+      - DB_USER=${DB_USER}
       - DB_PASSWORD=${PASSWORD}
       - DB_PORT=${PORT}
     volumes:
@@ -70,7 +70,7 @@ services:
     environment:
       - DB_HOST=${HOST}
       - DB_NAME=${DB_NAME}
-      - DB_USER=${USER}
+      - DB_USER=${DB_USER}
       - DB_PASSWORD=${PASSWORD}
       - DB_PORT=${PORT}
       - HF_HOME=/app/.cache/huggingface
@@ -110,7 +110,7 @@ services:
     environment:
       - DB_HOST=${HOST}
       - DB_NAME=${DB_NAME}
-      - DB_USER=${USER}
+      - DB_USER=${DB_USER}
       - DB_PASSWORD=${PASSWORD}
       - DB_PORT=${PORT}
     networks:
@@ -128,6 +128,19 @@ services:
     container_name: dbtodb_scheduler
     env_file:
       - ./.env
+    environment:
+      - DB_HOST=${HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${PASSWORD}
+      - DB_PORT=${PORT}
+      - SOURCE_DB_NAME=${SOURCE_DB_NAME}
+      - SOURCE_USER=${SOURCE_USER}
+      - SOURCE_PASSWORD=${SOURCE_PASSWORD}
+      - SOURCE_HOST=${SOURCE_HOST}
+      - SOURCE_PORT=${SOURCE_PORT}
+      - DBTODB_SCHEDULE_TIME=${DBTODB_SCHEDULE_TIME}
+      - PYTHONUNBUFFERED=1
     networks:
       - app-network
     restart: always

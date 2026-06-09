@@ -48,7 +48,7 @@ RUN pip install -r requirements.txt
 #RUN mkdir -p /app/.cache/huggingface && chown -R appuser:appgroup /app
 
 # Copy application code
-COPY --chown=appuser:appgroup AnalysisAPI.py analysispipeline.py ./
+COPY --chown=appuser:appgroup AnalysisAPI.py analysispipelines.py ./
 
 # Switch to non-root user
 USER appuser

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import threading
 import time
 
-from analysispipeline import run_analysis #ask_ai_about_call   # import both
+from analysispipelines import run_analysis #ask_ai_about_call   # import both
 
 app = FastAPI()
 

@@ -610,10 +610,10 @@ if "last_refresh" not in st.session_state:
 # ============================================================
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("USER"),
-    "password": os.getenv("PASSWORD"),
-    "host": os.getenv("HOST"),
-    "port": os.getenv("PORT")
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT")
 }
 
 # ============================================================
@@ -1214,7 +1214,7 @@ if st.session_state.selected_call is None:
             "Duration": raw_duration,
             "Agent Talk %": round((agent_utt / total) * 100, 1) if total else 0,
             "Customer Talk %": round((cust_utt / total) * 100, 1) if total else 0,
-            "Sentiment": call.get("sentiment", {}).get("agent", {}).get("label", "N/A"),
+            "Sentiment": call.get("sentiment", {}).get("agent", {}).get("label") or "N/A",
             "path": call_id
         })
 
@@ -1262,7 +1262,7 @@ if st.session_state.selected_call is None:
 
     # Table Rows with Sentiment Colors and Fixed View Button
     for i, row in agent_df.iterrows():
-        sentiment = row["Sentiment"].upper()
+        sentiment = (row["Sentiment"] or "N/A").upper()
         sentiment_class = "sentiment-positive" if sentiment == "POSITIVE" else "sentiment-negative" if sentiment == "NEGATIVE" else "sentiment-neutral"
 
         # Apply sentiment styling
