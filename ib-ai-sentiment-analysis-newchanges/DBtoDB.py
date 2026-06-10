@@ -40,7 +40,7 @@ def sync_dbtodb():
     now_ist = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST")
     print(f"[{now_ist}] Starting DBtoDB sync...")
 
-    yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+    yesterday = (datetime.now(IST) - timedelta(days=1)).strftime('%Y-%m-%d')
     print(f"Fetching data where processed_date = {yesterday}")
 
     # ==============================
