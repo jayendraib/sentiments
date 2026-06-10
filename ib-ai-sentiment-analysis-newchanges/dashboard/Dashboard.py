@@ -1902,30 +1902,29 @@ call_id = st.session_state.selected_call
 #         else:
 #             st.markdown('<span style="color: #64748b;">None detected</span>', unsafe_allow_html=True)
 
-# # Transcription
-# # ============================================================
-# # AUDIO PLAYER - Call Recording from S3
-# # ============================================================
-# st.markdown("<br>", unsafe_allow_html=True)
-# st.markdown('<div class="section-header">🔊 Call Recording</div>', unsafe_allow_html=True)
+# ============================================================
+# AUDIO PLAYER - Call Recording from S3
+# ============================================================
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown('<div class="section-header">🔊 Call Recording</div>', unsafe_allow_html=True)
 
-# audio_bytes = load_audio_from_s3(call_id)
+audio_bytes = load_audio_from_s3(call_id)
 
-# if audio_bytes:
-#     st.markdown("""
-#     <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;">
-#         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-#             <div style="width:36px;height:36px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;">🎧</div>
-#             <div>
-#                 <div style="font-size:15px;font-weight:600;color:#f8fafc;">Listen to Call</div>
-#                 <div style="font-size:12px;color:#64748b;">Streaming from S3</div>
-#             </div>
-#         </div>
-#     </div>
-#     """, unsafe_allow_html=True)
-#     st.audio(audio_bytes, format="audio/mp3")
-# else:
-#     st.info("🎧 No recording available for this call")
+if audio_bytes:
+    st.markdown("""
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;background:#6366f1;border-radius:8px;display:flex;align-items:center;justify-content:center;">🎧</div>
+            <div>
+                <div style="font-size:15px;font-weight:600;color:#f8fafc;">Listen to Call</div>
+                <div style="font-size:12px;color:#64748b;">Streaming from S3</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.audio(audio_bytes, format="audio/mp3")
+else:
+    st.info("🎧 No recording available for this call")
 
 # ============================================================
 # FULL CALL TRANSCRIPTION
