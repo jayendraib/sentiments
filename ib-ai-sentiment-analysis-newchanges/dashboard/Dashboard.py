@@ -634,7 +634,7 @@ def load_agent_summary():
 
     query = """
     SELECT
-        ca.agent_name,
+        TRIM(ca.agent_name) AS agent_name,
         ROUND(
             AVG(
                 (ca.call_json->'metadata'->'utterances'->>'agent')::INT * 100.0 /
@@ -680,8 +680,8 @@ def load_agent_summary():
         crt.processed_date as created_at
     FROM call_analysis ca
     LEFT JOIN call_records_test crt ON crt.source_pbx_call_id = ca.id
-    GROUP BY ca.agent_name, crt.processed_date
-    ORDER BY ca.agent_name;
+    GROUP BY TRIM(ca.agent_name), crt.processed_date
+    ORDER BY TRIM(ca.agent_name);
     """
 
     df = pd.read_sql(query, conn)
@@ -969,6 +969,7 @@ if not st.session_state.show_main_dashboard:
         st.session_state.agent_summary_df = load_agent_summary()
 
     df = st.session_state.agent_summary_df
+    df['Agent Name'] = df['Agent Name'].str.strip()
 
     # Ensure created_at is datetime
     if 'created_at' in df.columns and not pd.api.types.is_datetime64_any_dtype(df['created_at']):
@@ -1076,7 +1077,8 @@ if not st.session_state.show_main_dashboard:
 
     # KPI Cards for Overview
     # KPI Cards for Overview - FIXED VERSION
-    total_agents = len(df_filtered)
+    #total_agents = len(df_filtered)
+    total_agents = df_filtered['Agent Name'].nunique()
     total_calls = int(df_filtered['Total Calls'].sum()) if 'Total Calls' in df_filtered.columns else 0
 
     # Calculate both sentiment averages
