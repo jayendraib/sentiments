@@ -974,6 +974,7 @@ if not st.session_state.show_main_dashboard:
     # Ensure created_at is datetime
     if 'created_at' in df.columns and not pd.api.types.is_datetime64_any_dtype(df['created_at']):
         df['created_at'] = pd.to_datetime(df['created_at'])
+    df['Agent Name'] = df['Agent Name'].str.strip()
 
     # Get available dates for the picker
     available_dates = sorted(df['created_at'].dt.date.unique()) if 'created_at' in df.columns else []
@@ -1065,6 +1066,7 @@ if not st.session_state.show_main_dashboard:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    '''
     # FILTER agents based on search query
     if search_query:
         df_filtered = df[df['Agent Name'].str.contains(search_query, case=False, na=False)]
@@ -1073,7 +1075,28 @@ if not st.session_state.show_main_dashboard:
 
         # FILTER by selected date (only if not "All")
     if st.session_state.get('selected_date') != "All" and st.session_state.get('selected_date') and 'created_at' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date] '''
+    # FILTER agents based on search query - FIXED VERSION (now applies before date filter and re-aggregation)
+    if search_query:
+        df_filtered = df[df['Agent Name'].str.contains(search_query, case=False, na=False)]
+    else:
+        df_filtered = df.copy()
+
+    # FILTER by selected date (only if not "All")
+    if st.session_state.get('selected_date') != "All" and st.session_state.get('selected_date') and 'created_at' in df_filtered.columns:
         df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date]
+    else:
+        # When "All" is selected: re-aggregate so each agent appears ONCE
+        # # Sum calls, weighted average duration, average sentiment
+        df_filtered = df_filtered.groupby('Agent Name', as_index=False).agg({
+            'Total Calls': 'sum',
+            'Avg Duration (sec)': lambda x: (x * df_filtered.loc[x.index, 'Total Calls']).sum() / df_filtered.loc[x.index, 'Total Calls'].sum() if df_filtered.loc[x.index, 'Total Calls'].sum() > 0 else 0,
+            'Agent Avg Sentiment': 'mean',
+            'Customer Avg Sentiment': 'mean',
+            'Average Agent Talk Percent': 'mean',
+            'Average Customer Talk Percent': 'mean',
+            'created_at': 'max' # Keep latest date
+            })
 
     # KPI Cards for Overview
     # KPI Cards for Overview - FIXED VERSION
