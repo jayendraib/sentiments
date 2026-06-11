@@ -677,10 +677,10 @@ def load_agent_summary():
         ) AS avg_customer_talk_pct,
         COUNT(*) AS total_calls,
         ROUND(AVG(crt.conversation_duration)::NUMERIC, 0) AS avg_duration_sec,
-        MAX(ca.created_at) as created_at
+        crt.processed_date as created_at
     FROM call_analysis ca
     LEFT JOIN call_records_test crt ON crt.source_pbx_call_id = ca.id
-    GROUP BY ca.agent_name
+    GROUP BY ca.agent_name, crt.processed_date
     ORDER BY ca.agent_name;
     """
 

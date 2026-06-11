@@ -5,13 +5,13 @@ import os
 from dotenv import load_dotenv
 import time
 
-import pytz
+from datetime import timezone
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 load_dotenv(override=True)
 
-IST = pytz.timezone("Asia/Kolkata")
+IST = timezone(timedelta(hours=5, minutes=30))
 
 # ==============================
 # SOURCE DATABASE (Prodtest)
@@ -137,10 +137,12 @@ except ValueError:
     print(f"Invalid DBTODB_SCHEDULE_TIME='{run_time}'. Expected HH:MM. Defaulting to 09:00 IST.")
     hour, minute = 9, 0
 
-scheduler = BlockingScheduler(timezone=IST)
+import pytz as _pytz
+_IST_PYTZ = _pytz.timezone("Asia/Kolkata")
+scheduler = BlockingScheduler(timezone=_IST_PYTZ)
 scheduler.add_job(
     sync_dbtodb,
-    CronTrigger(hour=hour, minute=minute, timezone=IST),
+    CronTrigger(hour=hour, minute=minute, timezone=_IST_PYTZ),
     id="dbtodb_daily",
     name="DBtoDB daily sync",
 )
