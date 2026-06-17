@@ -677,10 +677,10 @@ def load_agent_summary():
         ) AS avg_customer_talk_pct,
         COUNT(*) AS total_calls,
         ROUND(AVG(crt.conversation_duration)::NUMERIC, 0) AS avg_duration_sec,
-        crt.processed_date as created_at
+        crt.created_at
     FROM call_analysis ca
     LEFT JOIN call_records_test crt ON crt.source_pbx_call_id = ca.id
-    GROUP BY TRIM(ca.agent_name), crt.processed_date
+    GROUP BY TRIM(ca.agent_name), crt.created_at
     ORDER BY TRIM(ca.agent_name);
     """
 
@@ -786,13 +786,13 @@ def load_all_calls():
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
         SELECT ca.id, ca.agent_name, ca.call_json, ca.created_at,
-               crt.conversation_duration, crt.processed_date
+               crt.conversation_duration, crt.created_at AS source_date
         FROM call_analysis ca
         LEFT JOIN call_records_test crt ON crt.source_pbx_call_id = ca.id
         ORDER BY ca.created_at DESC
     """)
     for row in cur.fetchall():
-        calls.append((row["id"], row["agent_name"], row["call_json"], row["created_at"], row["conversation_duration"], row["processed_date"]))
+        calls.append((row["id"], row["agent_name"], row["call_json"], row["created_at"], row["conversation_duration"], row["source_date"]))
     cur.close()
     conn.close()
     return calls
@@ -1249,7 +1249,7 @@ if st.session_state.selected_call is None:
     calls = load_all_calls()
     rows = []
 
-    for call_id, agent_name, call, created_at, conversation_duration, processed_date in calls:
+    for call_id, agent_name, call, created_at, conversation_duration, source_date in calls:
         meta = call.get("metadata", {})
         utt = meta.get("utterances", {})
 
@@ -1270,7 +1270,7 @@ if st.session_state.selected_call is None:
         rows.append({
             "Agent": agent_name,
             "Call ID": meta.get("file", f"call_{call_id}"),
-            "Date": processed_date.strftime("%Y-%m-%d") if processed_date else created_at.strftime("%Y-%m-%d"),
+            "Date": source_date.strftime("%Y-%m-%d") if source_date else created_at.strftime("%Y-%m-%d"),
             "Duration": raw_duration,
             "Agent Talk %": round((agent_utt / total) * 100, 1) if total else 0,
             "Customer Talk %": round((cust_utt / total) * 100, 1) if total else 0,

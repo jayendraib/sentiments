@@ -9,6 +9,7 @@ import os
 import tempfile
 import time
 import threading
+import subprocess
 from urllib.parse import urlparse
 from whisperx.diarize import DiarizationPipeline
 import uvicorn
@@ -112,24 +113,72 @@ def download_audio(call_id, s3_link):
         bucket_name = parsed_url.netloc.split(".")[0]
         s3_key = parsed_url.path.lstrip("/")
 
+    # Preserve the original file extension from S3 so ffmpeg can parse it correctly.
+    # Hardcoding .wav breaks calls when the actual file is .mp3, .amr, etc.
+    original_ext = os.path.splitext(s3_key)[1] or ".wav"
     temp_audio_path = os.path.join(
         tempfile.gettempdir(),
-        f"{call_id}.wav"
+        f"{call_id}{original_ext}"
     )
 
     s3.download_file(bucket_name, s3_key, temp_audio_path)
 
+    file_size = os.path.getsize(temp_audio_path)
+    if file_size == 0:
+        raise RuntimeError(f"Downloaded audio file is empty (0 bytes) for call {call_id}: {s3_link}")
+
+    print(f"Downloaded {file_size} bytes from {s3_key} -> {temp_audio_path}")
     return temp_audio_path
+
+# ============================================================
+# AUDIO PRE-CONVERSION
+# ============================================================
+
+def convert_audio_for_whisperx(audio_path):
+    """
+    PBX systems often store audio as .wav but with non-standard codecs
+    (GSM 6.10, G.711 μ-law/A-law) that ffmpeg can't auto-detect.
+    This converts the file to plain 16kHz mono PCM WAV before WhisperX.
+    """
+    out_path = audio_path + "_pcm.wav"
+
+    attempts = [
+        # (description, extra_input_flags)
+        ("auto-detect",    []),
+        ("force WAV",      ["-f", "wav"]),
+        ("G.711 mulaw",    ["-f", "mulaw", "-ar", "8000", "-ac", "1"]),
+        ("G.711 alaw",     ["-f", "alaw",  "-ar", "8000", "-ac", "1"]),
+        ("GSM 6.10",       ["-f", "gsm",   "-ar", "8000"]),
+    ]
+
+    last_err = ""
+    for desc, input_flags in attempts:
+        cmd = ["ffmpeg", "-y"] + input_flags + [
+            "-i", audio_path,
+            "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",
+            out_path
+        ]
+        result = subprocess.run(cmd, capture_output=True)
+        if result.returncode == 0:
+            print(f"Audio converted using: {desc}")
+            return out_path
+        last_err = result.stderr.decode()[-300:]
+
+    raise RuntimeError(
+        f"Cannot decode audio file {audio_path} in any known format.\n"
+        f"Last ffmpeg error: {last_err}"
+    )
 
 # ============================================================
 # TRANSCRIPTION FUNCTION
 # ============================================================
 
-def process_call(call_id):
+def process_call(call_id, call_created_at=None):
 
     conn = connection_pool.getconn()
     cur = conn.cursor()
     audio_path = None
+    converted_path = None
 
     try:
 
@@ -193,7 +242,8 @@ def process_call(call_id):
         audio_path = download_audio(call_id, s3_link)
         print(f"STEP 2 - Audio downloaded: {audio_path}")
 
-        audio = whisperx.load_audio(audio_path)
+        converted_path = convert_audio_for_whisperx(audio_path)
+        audio = whisperx.load_audio(converted_path)
         print("STEP 3 - Audio loaded")
 
         # ===============================
@@ -250,9 +300,10 @@ def process_call(call_id):
                 call_recording_link,
                 transcribed_text,
                 status,
-                confidence_score
+                confidence_score,
+                created_at
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             call_id,
             user_name,
@@ -260,7 +311,8 @@ def process_call(call_id):
             s3_link,
             "\n".join(final_transcript),
             "processed",
-            0.0
+            0.0,
+            call_created_at
         ))
 
         conn.commit()
@@ -275,12 +327,13 @@ def process_call(call_id):
 
     finally:
         # Cleanup
-        if audio_path and os.path.exists(audio_path):
-            try:
-                os.remove(audio_path)
-                print(f"Cleaned up: {audio_path}")
-            except Exception as cleanup_error:
-                print(f"Failed to cleanup {audio_path}: {cleanup_error}")
+        for path in [audio_path, converted_path]:
+            if path and os.path.exists(path):
+                try:
+                    os.remove(path)
+                    print(f"Cleaned up: {path}")
+                except Exception as cleanup_error:
+                    print(f"Failed to cleanup {path}: {cleanup_error}")
 
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
@@ -301,7 +354,7 @@ def background_worker():
             cur = conn.cursor()
 
             cur.execute("""
-                SELECT w.source_pbx_call_id
+                SELECT w.source_pbx_call_id, w.created_at
                 FROM call_records_test w
                 LEFT JOIN call_audio c
                 ON w.source_pbx_call_id = c.call_audio_id
@@ -316,9 +369,9 @@ def background_worker():
                 print(f"Found {len(rows)} new calls")
 
             for row in rows:
-                call_id = row[0]
+                call_id, call_created_at = row[0], row[1]
                 print("Processing call:", call_id)
-                process_call(call_id)
+                process_call(call_id, call_created_at)
 
             cur.close()
         except Exception as e:

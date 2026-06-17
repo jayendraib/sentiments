@@ -176,14 +176,15 @@ def run_analysis():
     print("   ✅ JSON built successfully")
 
     # 1. Upsert analysis into call_analysis table
+    # Use created_at from call_audio (sourced from call_records_test), not system time
     cur.execute("""
         INSERT INTO call_analysis (id, agent_name, call_json, created_at)
-        VALUES (%s, %s, %s, NOW())
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT (id) DO UPDATE SET
             agent_name = EXCLUDED.agent_name,
             call_json = EXCLUDED.call_json,
-            created_at = NOW()
-    """, (audio_id, agent_name, json.dumps(output, indent=2, default=str)))
+            created_at = EXCLUDED.created_at
+    """, (audio_id, agent_name, json.dumps(output, indent=2, default=str), created_at))
 
     # 2. Mark as done in call_audio
     cur.execute("""
