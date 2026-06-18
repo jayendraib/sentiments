@@ -1078,7 +1078,7 @@ if not st.session_state.show_main_dashboard:
         df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date]
 
     # FIXED: Always aggregate so each agent appears ONCE
-    if not df_filtered.empty:
+    if not df_filtered.empty: 
         # Helper for weighted duration
         df_filtered['__weighted_duration'] = df_filtered['Avg Duration (sec)'] * df_filtered['Total Calls']
 
