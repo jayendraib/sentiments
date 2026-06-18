@@ -186,7 +186,7 @@ def process_call(call_id, call_created_at=None):
         # FETCH CALL DATA
         # ===============================
         cur.execute("""
-            SELECT agent_id, s3_file_path
+            SELECT agent_id, s3_file_path,conversation_duration
             FROM call_records_test
             WHERE source_pbx_call_id = %s
         """, (call_id,))
@@ -196,7 +196,11 @@ def process_call(call_id, call_created_at=None):
             print(f"Call {call_id} not found in call_records_test")
             return
 
-        agent_id, s3_link = row
+        agent_id, s3_link, conversation_duration = row
+        if conversation_duration is None or conversation_duration == '':
+            conversation_duration = 0
+        else:
+            conversation_duration = int(float(conversation_duration))
 
         # ===============================
         # GET AGENT NAME
@@ -222,13 +226,17 @@ def process_call(call_id, call_created_at=None):
                 INSERT INTO call_audio (
                     call_audio_id,
                     call_recording_link,
-                    status
+                    status,
+                    created_at,
+                    call_duration_sec
                 )
-                VALUES (%s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s)
             """, (
                 source_pbx_call_id,
                 s3_link,
-                "embedding not found"
+                "Not processed",
+                call_created_at,
+                conversation_duration
             ))
             conn.commit()
             print(f"Call {call_id} skipped - Agent ID {agent_id} not found in agents_numbers")
@@ -301,9 +309,10 @@ def process_call(call_id, call_created_at=None):
                 transcribed_text,
                 status,
                 confidence_score,
-                created_at
+                created_at,
+                call_duration_sec
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             call_id,
             user_name,
@@ -312,7 +321,8 @@ def process_call(call_id, call_created_at=None):
             "\n".join(final_transcript),
             "processed",
             0.0,
-            call_created_at
+            call_created_at,
+            conversation_duration
         ))
 
         conn.commit()

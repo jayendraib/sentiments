@@ -1067,6 +1067,7 @@ if not st.session_state.show_main_dashboard:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+
         # FILTER agents based on search query
     if search_query:
         df_filtered = df[df['Agent Name'].str.contains(search_query, case=False, na=False)]
@@ -1078,7 +1079,7 @@ if not st.session_state.show_main_dashboard:
         df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date]
 
     # FIXED: Always aggregate so each agent appears ONCE
-    if not df_filtered.empty: 
+    if not df_filtered.empty:
         # Helper for weighted duration
         df_filtered['__weighted_duration'] = df_filtered['Avg Duration (sec)'] * df_filtered['Total Calls']
 
