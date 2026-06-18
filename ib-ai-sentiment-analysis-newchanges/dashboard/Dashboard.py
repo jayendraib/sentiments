@@ -11,7 +11,8 @@ import os
 from dotenv import load_dotenv
 import boto3
 
-load_dotenv(dotenv_path="/app/.env")
+#load_dotenv(dotenv_path="/app/.env")
+load_dotenv(override=True)
 # ============================================================
 # PAGE CONFIG - PROFESSIONAL DARK THEME
 # ============================================================
@@ -1066,17 +1067,7 @@ if not st.session_state.show_main_dashboard:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    '''
-    # FILTER agents based on search query
-    if search_query:
-        df_filtered = df[df['Agent Name'].str.contains(search_query, case=False, na=False)]
-    else:
-        df_filtered = df
-
-        # FILTER by selected date (only if not "All")
-    if st.session_state.get('selected_date') != "All" and st.session_state.get('selected_date') and 'created_at' in df_filtered.columns:
-        df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date] '''
-    # FILTER agents based on search query - FIXED VERSION (now applies before date filter and re-aggregation)
+        # FILTER agents based on search query
     if search_query:
         df_filtered = df[df['Agent Name'].str.contains(search_query, case=False, na=False)]
     else:
@@ -1085,26 +1076,38 @@ if not st.session_state.show_main_dashboard:
     # FILTER by selected date (only if not "All")
     if st.session_state.get('selected_date') != "All" and st.session_state.get('selected_date') and 'created_at' in df_filtered.columns:
         df_filtered = df_filtered[df_filtered['created_at'].dt.date == st.session_state.selected_date]
-    else:
-        # When "All" is selected: re-aggregate so each agent appears ONCE
-        # # Sum calls, weighted average duration, average sentiment
-        df_filtered = df_filtered.groupby('Agent Name', as_index=False).agg({
+
+    # FIXED: Always aggregate so each agent appears ONCE
+    if not df_filtered.empty:
+        # Helper for weighted duration
+        df_filtered['__weighted_duration'] = df_filtered['Avg Duration (sec)'] * df_filtered['Total Calls']
+
+        # Build aggregation
+        agg_dict = {
             'Total Calls': 'sum',
-            'Avg Duration (sec)': lambda x: (x * df_filtered.loc[x.index, 'Total Calls']).sum() / df_filtered.loc[x.index, 'Total Calls'].sum() if df_filtered.loc[x.index, 'Total Calls'].sum() > 0 else 0,
+            '__weighted_duration': 'sum',
             'Agent Avg Sentiment': 'mean',
             'Customer Avg Sentiment': 'mean',
             'Average Agent Talk Percent': 'mean',
             'Average Customer Talk Percent': 'mean',
-            'created_at': 'max' # Keep latest date
-            })
+        }
+        if 'created_at' in df_filtered.columns:
+            agg_dict['created_at'] = 'max'
+
+        # Group by agent and aggregate
+        df_filtered = df_filtered.groupby('Agent Name', as_index=False).agg(agg_dict)
+
+        # Calculate weighted average duration
+        df_filtered['Avg Duration (sec)'] = df_filtered.apply(
+            lambda row: row['__weighted_duration'] / row['Total Calls'] if row['Total Calls'] > 0 else 0,
+            axis=1
+        )
+        df_filtered = df_filtered.drop(columns=['__weighted_duration'])
 
     # KPI Cards for Overview
-    # KPI Cards for Overview - FIXED VERSION
-    #total_agents = len(df_filtered)
     total_agents = df_filtered['Agent Name'].nunique()
     total_calls = int(df_filtered['Total Calls'].sum()) if 'Total Calls' in df_filtered.columns else 0
 
-    # Calculate both sentiment averages
     if not df_filtered.empty:
         avg_agent_sentiment = df_filtered['Agent Avg Sentiment'].mean()
         avg_customer_sentiment = df_filtered['Customer Avg Sentiment'].mean()
