@@ -13,11 +13,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_HOST=${HOST}
+      - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${PASSWORD}
-      - DB_PORT=${PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
     volumes:
       - torch_cache:/root/.cache/torch       
       - hf_cache:/root/.cache/huggingface     
@@ -68,11 +68,11 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - DB_HOST=${HOST}
+      - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${PASSWORD}
-      - DB_PORT=${PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
       - HF_HOME=/app/.cache/huggingface
       - OLLAMA_HOST=http://ollama:11434
 
@@ -108,11 +108,11 @@ services:
     ports:
       - "8501:8501"
     environment:
-      - DB_HOST=${HOST}
+      - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${PASSWORD}
-      - DB_PORT=${PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
     networks:
       - app-network
     restart: always
@@ -129,11 +129,11 @@ services:
     env_file:
       - ./.env
     environment:
-      - DB_HOST=${HOST}
+      - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${PASSWORD}
-      - DB_PORT=${PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
       - SOURCE_DB_NAME=${SOURCE_DB_NAME}
       - SOURCE_USER=${SOURCE_USER}
       - SOURCE_PASSWORD=${SOURCE_PASSWORD}
